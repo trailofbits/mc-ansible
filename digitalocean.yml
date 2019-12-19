@@ -1,0 +1,95 @@
+# DigitalOcean Playbook
+---
+- name: DigitalOcean
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  
+  tasks:
+
+  - name: Include the variables for droplet creation
+    include_vars: vars/droplet.yml
+
+  - name: Create Droplet
+    digital_ocean:
+      state: present
+      command: droplet
+      name: "{{ droplet_name }}"
+      api_token: "{{ digital_ocean_api_token }}"
+      size_id: "{{ droplet_size }}"
+      region_id: "{{ droplet_region }}"
+      image_id: "{{ droplet_image }}"
+      ssh_key_ids: "{{ droplet_ssh_key_id }}"
+      unique_name: yes
+      wait_timeout: 500
+    register: droplet_info
+
+  - name: Add new instance to host group
+    add_host: hostname={{ droplet_info.droplet.ip_address }} groupname=digital_ocean_droplet
+
+  - name: Wait for SSH to come up
+    wait_for: host={{ droplet_info.droplet.ip_address }} port=22 delay=10 timeout=60 state=started
+
+- name: Configure manticore instance
+  hosts: digital_ocean_droplet
+  remote_user: root
+  gather_facts: False
+
+  tasks:
+
+    - name: include ansible / manticore vars
+      include_vars: vars/ansible.yml
+    
+    - name: Create a user with sudo privileges
+      user:
+        name: "{{ remote_uname }}"
+        state: present
+        shell: /bin/bash
+        groups: sudo
+
+    - name: Set authorized key with id_rsa.pub home file
+      authorized_key:
+        user: "{{ remote_uname }}"
+        state: present
+        key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_ed25519.pub') }}"
+
+    - name: Allow run commands as root with dropletuser
+      shell: "echo '%sudo ALL=NOPASSWD: ALL' >> /etc/sudoers"
+    
+    - name: Install pip on remote droplet
+      apt:
+        name: python3-pip 
+        state: present
+        update_cache: yes
+
+    - name: Install manticore on remote droplet
+      pip: 
+        name: manticore[native]
+
+    - name: Copy cwd to remote droplet
+      become: yes
+      become_user: "{{ remote_uname }}"
+      copy: 
+        src: "."
+        dest: "~/"
+
+    - name: Run target script
+      become: yes
+      become_user: "{{ remote_uname }}"
+      shell: |
+        cd ~/
+        python3 {{ manticore_script }}
+      register: log_output
+      
+    - name: Save logs
+      local_action: copy content={{ log_output }} dest={{ logfile }}
+
+    - name: Fetch manticore results from remote server
+      become: yes
+      become_user: "{{ remote_uname }}"
+      synchronize:
+        rsync_path: "sudo rsync"
+        mode: pull
+        src:  "/home/{{ remote_uname }}/{{ results_dir }}/."
+        dest: "{{ results_dir }}/"
+        recursive: yes

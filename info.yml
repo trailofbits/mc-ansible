@@ -1,0 +1,19 @@
+# DigitalOcean Info Playbook
+---
+- name: DigitalOcean
+  hosts: localhost
+  connection: local
+  gather_facts: False
+
+  tasks:
+
+  - name: Include variables
+    include_vars: vars/droplet
+
+  - name: Obtain SSH id
+    digital_ocean:
+      state: present
+      command: ssh
+      name: "{{ ansible_user_id }}"
+      ssh_pub_key: "{{ droplet_ssh_key }}"
+      api_token: "{{ digital_ocean_api_token }}"

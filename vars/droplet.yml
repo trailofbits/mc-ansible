@@ -1,0 +1,11 @@
+digital_ocean_api_token: # Replace this with your DigitalOcean API token
+ansible_user_id: root
+remote_uname: dropletuser
+droplet_region: nyc1
+droplet_size: 512mb
+droplet_image: ubuntu-18-04-x64
+droplet_name: ubuntu-18.04-droplet
+droplet_ssh_key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_ed25519.pub') }}"
+droplet_ssh_key_id: 26056127
+manticore_script: test_script.py
+remote_uname: dropletuser
