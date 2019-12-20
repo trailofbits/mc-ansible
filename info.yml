@@ -8,7 +8,7 @@
   tasks:
 
   - name: Include variables
-    include_vars: vars/droplet
+    include_vars: vars/droplet.yml
 
   - name: Obtain SSH id
     digital_ocean:
