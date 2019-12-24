@@ -20,7 +20,7 @@
       region_id: "{{ droplet_region }}"
       image_id: "{{ droplet_image }}"
       ssh_key_ids: "{{ droplet_ssh_key_id }}"
-      unique_name: yes
+      unique_name: no
       wait_timeout: 500
     register: droplet_info
 

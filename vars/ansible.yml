@@ -1,7 +1,5 @@
-manticore_script: multiple-styles-solve.py # Manticore script to be run
+manticore_script: multiple-styles-solve.py
 remote_uname: dropletuser
-working_dir: # Replace this with your cwd
+working_dir: "{{ lookup('env','PWD') }}"
 logfile: "{{ working_dir }}/manticore_logs"
-results_dir: manticore_results # Where manticore results are to be stored
-
-
+results_dir: manticore_results
