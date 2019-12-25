@@ -10,6 +10,16 @@
   - name: Include the variables for droplet creation
     include_vars: vars/droplet.yml
 
+  - name: Obtain SSH id
+    digital_ocean:
+      state: present
+      command: ssh
+      name: "{{ ansible_user_id }}"
+      ssh_pub_key: "{{ droplet_ssh_key }}"
+      api_token: "{{ digital_ocean_api_token }}"
+
+    register: do_ssh_key
+
   - name: Create Droplet
     digital_ocean:
       state: present
@@ -19,8 +29,8 @@
       size_id: "{{ droplet_size }}"
       region_id: "{{ droplet_region }}"
       image_id: "{{ droplet_image }}"
-      ssh_key_ids: "{{ droplet_ssh_key_id }}"
-      unique_name: no
+      ssh_key_ids: "{{ do_ssh_key.ssh_key.id }}"
+      unique_name: yes
       wait_timeout: 500
     register: droplet_info
 
