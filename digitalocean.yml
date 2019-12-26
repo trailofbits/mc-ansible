@@ -11,12 +11,11 @@
     include_vars: vars/droplet.yml
 
   - name: Remove current SSH key (to support use on different machines)
-    digital_ocean:
+    digital_ocean_sshkey:
       state: absent
-      command: ssh
       name: "{{ ssh_key_name }}"
       ssh_pub_key: "{{ droplet_ssh_key }}"
-      api_token: "{{ digital_ocean_api_token }}"
+      oauth_token: "{{ digital_ocean_api_token }}"
 
   - name: Ensure SSH key exists on DigitalOcean
     digital_ocean:
