@@ -10,16 +10,23 @@
   - name: Include the variables for droplet creation
     include_vars: vars/droplet.yml
 
-  - name: Obtain SSH id
+  - name: Remove current SSH key (to support use on different machines)
     digital_ocean:
-      state: present
+      state: absent
       command: ssh
-      name: "{{ ansible_user_id }}"
+      name: "{{ ssh_key_name }}"
       ssh_pub_key: "{{ droplet_ssh_key }}"
       api_token: "{{ digital_ocean_api_token }}"
 
+  - name: Ensure SSH key exists on DigitalOcean
+    digital_ocean:
+      state: present
+      command: ssh
+      name: "{{ ssh_key_name }}"
+      ssh_pub_key: "{{ droplet_ssh_key }}"
+      api_token: "{{ digital_ocean_api_token }}"
     register: do_ssh_key
-
+  
   - name: Create Droplet
     digital_ocean:
       state: present
