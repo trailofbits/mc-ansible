@@ -12,18 +12,13 @@
 
   - name: Obtain droplet info
     digital_ocean:
-      command: droplet
       name: "{{ droplet_name }}"
       api_token: "{{ digital_ocean_api_token }}"
-      size_id: "{{ droplet_size }}"
-      region_id: "{{ droplet_region }}"
-      image_id: "{{ droplet_image }}"
-      ssh_key_ids: "{{ droplet_ssh_key_id }}"
       unique_name: yes
       wait_timeout: 500
     register: droplet_info
 
-  - name: Remove Droplet
+  - name: Remove droplet
     digital_ocean:
         api_token: "{{ digital_ocean_api_token }}"
         id: "{{ droplet_info.droplet.id }}"
