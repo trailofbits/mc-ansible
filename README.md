@@ -23,13 +23,9 @@ Below is a description of all variables necessary for configuration.
 `ansible.yml` holds user-oriented variables for the provisioned DigitalOcean droplet instance.
 
 * manticore_script: the path to the manticore script that will be executed on the droplet
-
 * remote_uname: your username on the droplet
-
 * working_dir: the current working directory 
-
 * logfile: file to save the stdout of a manticore run on the droplet to
-
 * results_dir: path to the results of the manticore script to copy back to local from the droplet.
 
 
@@ -49,4 +45,7 @@ Below is a description of all variables necessary for configuration.
 ### Tearing down the VM
 * Run `ansible-playbook -vvv tear_down_instance.yml`
 
-Note: when provisioning and tearing down multiple instances, change the value of `droplet_name` in `vars/droplet.yml` to be the respective name of the instance to destroy.
+### Notes
+
+* When provisioning and tearing down multiple instances, change the value of `droplet_name` in `vars/droplet.yml` to be the respective name of the instance to destroy.
+* Sometimes if the SSH service on the droplet times out, a permission denied error will occur when re-running the `digitalocean.yml` script.  To solve this issue, run `ansible-playbook reset_ssh_key.yml -vv` to reset the SSH key on the server.
