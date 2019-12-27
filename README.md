@@ -2,7 +2,37 @@
 
 An Ansible script to automatically provision manticore in the cloud
 
-## Actual documentation
+## Variables
+
+Below is a description of all variables necessary for configuration.
+
+### vars/droplet.yml
+
+`droplet.yml` holds droplet-oriented variables for the initial DigitalOcean droplet provisioning process.
+
+* digital_ocean_api_token: DigitalOcean API key (DigitalOcean recommends pre-setting an environment variable `DO_TOKEN` and including its contents via  `"{{ lookup('env','DO_TOKEN') }}"`)
+* ssh_key_name: name of SSH key to put on server
+* droplet_region: region in which to provision an instance
+* droplet_size: desired size of droplet
+* droplet_image: OS / distribution of droplet
+* droplet_name: desired name of droplet
+* droplet_ssh_key: path to SSH public key to copy to server (defined as `"{{ lookup('file', lookup('env','HOME') + '/.ssh/<key_name>') }}"`)
+
+### vars/ansible.yml
+
+`ansible.yml` holds user-oriented variables for the provisioned DigitalOcean droplet instance.
+
+* manticore_script: the path to the manticore script that will be executed on the droplet
+
+* remote_uname: your username on the droplet
+
+* working_dir: the current working directory 
+
+* logfile: file to save the stdout of a manticore run on the droplet to
+
+* results_dir: path to the results of the manticore script to copy back to local from the droplet.
+
+
 
 ### Initial setup
 
@@ -19,4 +49,4 @@ An Ansible script to automatically provision manticore in the cloud
 ### Tearing down the VM
 * Run `ansible-playbook -vvv tear_down_instance.yml`
 
-
+Note: when provisioning and tearing down multiple instances, change the value of `droplet_name` in `vars/droplet.yml` to be the respective name of the instance to destroy.
