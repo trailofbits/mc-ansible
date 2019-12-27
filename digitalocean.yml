@@ -97,19 +97,17 @@
       become: yes
       become_user: "{{ remote_uname }}"
       shell: |
-        cd ~
-        python3 {{ manticore_script }}
+        cd "/home/{{ remote_uname }}/{{ manticore_env }}"
+        python3 "{{ manticore_script }}"
       register: log_output
 
     - name: Save logs
       local_action: copy content={{ log_output }} dest={{ logfile }}
 
     - name: Fetch manticore results from remote server
-      become: yes
-      become_user: "{{ remote_uname }}"
       synchronize:
         rsync_path: "sudo rsync"
         mode: pull
-        src:  "/home/{{ remote_uname }}/{{ results_dir }}/."
-        dest: "{{ results_dir }}/"
+        src:  "/home/{{ remote_uname }}/{{ manticore_env }}/."
+        dest: "{{ manticore_env }}/"
         recursive: yes
