@@ -85,18 +85,22 @@
     - name: Copy cwd to remote droplet
       become: yes
       become_user: "{{ remote_uname }}"
-      copy: 
-        src: "."
-        dest: "~/"
+      synchronize: 
+        src: "./"
+        dest: "/home/{{ remote_uname }}/"
+        dirs: yes
+        mode: push
+        rsync_opts:
+            - "--exclude=.git/"
 
-    - name: Run target script
+    - name: Run target script asynchronously
       become: yes
       become_user: "{{ remote_uname }}"
       shell: |
-        cd ~/
+        cd ~
         python3 {{ manticore_script }}
       register: log_output
-      
+
     - name: Save logs
       local_action: copy content={{ log_output }} dest={{ logfile }}
 
