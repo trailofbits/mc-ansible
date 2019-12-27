@@ -23,13 +23,9 @@ Below is a description of all variables necessary for configuration.
 `ansible.yml` holds user-oriented variables for the provisioned DigitalOcean droplet instance.
 
 * manticore_script: the path to the manticore script that will be executed on the droplet
-
 * remote_uname: your username on the droplet
-
 * working_dir: the current working directory 
-
 * logfile: file to save the stdout of a manticore run on the droplet to
-
 * results_dir: path to the results of the manticore script to copy back to local from the droplet.
 
 
