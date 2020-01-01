@@ -44,8 +44,11 @@ Below is a description of all variables necessary for configuration.
 
 ### Tearing down the VM
 * Run `ansible-playbook -vvv tear_down_instance.yml`
-
-### Notes
-
 * When provisioning and tearing down multiple instances, change the value of `droplet_name` in `vars/droplet.yml` to be the respective name of the instance to destroy.
+
+### Notes / Recommendations
+* The current Ansible playbooks use the digital_ocean module, which has its roots in python 2.  As such, when installing dopy via `pip3`, a `basestr` is not defined error will occur.  To fix this, open `~/.local/lib/python3.7/site-packages/dopy/manager.py` and change all occurrences of `basestr` to `str`. 
+* As of Ansible 2.8, another module `digital_ocean_droplet` has been added, which does not require a prior `pip3 install`.  However, it has only one page of documentation (i.e. relatively poor support) and from what I've seen, is bug-ridden and error-prone. 
+
+### Known Issues
 * Sometimes if the SSH service on the droplet times out, a permission denied error will occur when re-running the `digitalocean.yml` script.  To solve this issue, run `ansible-playbook reset_ssh_key.yml -vv` to reset the SSH key on the server.
