@@ -52,3 +52,4 @@ Below is a description of all variables necessary for configuration.
 
 ### Known Issues
 * Sometimes if the SSH service on the droplet times out, a permission denied error will occur when re-running the `digitalocean.yml` script.  To solve this issue, run `ansible-playbook reset_ssh_key.yml -vv` to reset the SSH key on the server.
+* Real-time logging really only works well if the script being run takes a long time to complete and outputs a large amount of data to stdout.  As of now, there doesn't seem to be a way to increase the log output rate, but this may change in the future.
