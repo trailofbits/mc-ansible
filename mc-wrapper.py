@@ -70,7 +70,7 @@ def main():
 		to_run = ["ansible-playbook"]
 		to_run.append(parsed.playbook)
 		to_run.append("--extra-vars")
-		to_run.append(files[0])
+		to_run.append("manticore_script={}".format(files[0]))
 		process = subprocess.Popen(to_run)
 
 	try:
@@ -82,6 +82,3 @@ def main():
 
 if __name__ == "__main__":
 	main()
-	
-
-	
