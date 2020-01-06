@@ -1,7 +1,0 @@
-[all:vars]
-ansible_connection=ssh
-ansible_user=dropletuser
-
-[digitalocean]
-localhost ansible_connection=local
-
