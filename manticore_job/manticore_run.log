@@ -1,0 +1,29 @@
+2020-01-03 16:56:05,371: [7339] m.c.manticore:[31mERROR:[0m Calling at running not allowed
+2020-01-03 16:56:05,375: [7339] m.c.worker:[31mERROR:[0m Exception in state 1: ManticoreError('context only allowed while NOT exploring states',)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.6/dist-packages/manticore/core/worker.py", line 121, in run
+    current_state.execute()
+  File "/usr/local/lib/python3.6/dist-packages/manticore/native/state.py", line 29, in execute
+    result = self._platform.execute()
+  File "/usr/local/lib/python3.6/dist-packages/manticore/platforms/linux.py", line 2433, in execute
+    self.current.execute()
+  File "/usr/local/lib/python3.6/dist-packages/manticore/native/cpu/abstractcpu.py", line 978, in execute
+    self._publish("will_execute_instruction", self._last_pc, insn)
+  File "/usr/local/lib/python3.6/dist-packages/manticore/utils/event.py", line 146, in _publish
+    self._publish_impl(_name, *args, **kwargs)
+  File "/usr/local/lib/python3.6/dist-packages/manticore/utils/event.py", line 163, in _publish_impl
+    sink._publish_impl(_name, *args, **kwargs)
+  File "/usr/local/lib/python3.6/dist-packages/manticore/utils/event.py", line 163, in _publish_impl
+    sink._publish_impl(_name, *args, **kwargs)
+  File "/usr/local/lib/python3.6/dist-packages/manticore/utils/event.py", line 161, in _publish_impl
+    sink._publish_impl(_name, self, *args, **kwargs)
+  File "/usr/local/lib/python3.6/dist-packages/manticore/utils/event.py", line 154, in _publish_impl
+    callback(robj(), *args, **kwargs)
+  File "/usr/local/lib/python3.6/dist-packages/manticore/native/manticore.py", line 259, in _hook_callback
+    cb(state)
+  File "multiple-styles-solve.py", line 9, in hook
+    m.context['flag'] += chr(cpu.AL - 10)
+  File "/usr/local/lib/python3.6/dist-packages/manticore/core/manticore.py", line 121, in newFunction
+    raise ManticoreError(f"{func.__name__} only allowed while NOT exploring states")
+manticore.exceptions.ManticoreError: context only allowed while NOT exploring states
+ 

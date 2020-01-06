@@ -1,0 +1,5 @@
+manticore_env: manticore_job
+manticore_script: multiple-styles-solve.py
+remote_uname: pwang00
+working_dir: "{{ lookup('env','PWD') }}"
+logfile: "{{ working_dir }}/manticore_logs"
