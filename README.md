@@ -5,7 +5,7 @@ A Python wrapper around Ansible to automatically provision Manticore both locall
 
 Below is a description of all variables necessary for configuration.
 
-### .mcore_config/vars/droplet.yml
+### vars/droplet.yml
 
 `droplet.yml` holds droplet-oriented variables for the initial DigitalOcean droplet provisioning process.
 
@@ -17,7 +17,7 @@ Below is a description of all variables necessary for configuration.
 * droplet_name: desired name of droplet
 * droplet_ssh_key: path to SSH public key to copy to server (defined as `"{{ lookup('file', lookup('env','HOME') + '/.ssh/<key_name>') }}"`)
 
-### .mcore_config/vars/ansible.yml
+### vars/ansible.yml
 
 `ansible.yml` holds user-oriented variables for the provisioned DigitalOcean droplet instance.
 
