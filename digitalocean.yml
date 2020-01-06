@@ -92,6 +92,12 @@
         mode: push
         rsync_opts:
             - "--exclude=.git/"
+    
+    - name: Create manticore environment
+      become: yes
+      become_user: "{{ remote_uname }}"
+      shell:
+        mv "{{ manticore_script }} {{ manticore_env }}" 
 
     - name: Watch target script output (tail)
       include_role:
