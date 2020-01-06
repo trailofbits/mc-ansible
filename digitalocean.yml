@@ -86,7 +86,7 @@
       become: yes
       become_user: "{{ remote_uname }}"
       synchronize: 
-        src: "./"
+        src: "{{ working_dir }}"
         dest: "/home/{{ remote_uname }}/"
         dirs: yes
         mode: push
