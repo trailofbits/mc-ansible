@@ -14,6 +14,7 @@ logging.basicConfig(filename="mcprov.log",
     format='%(asctime)s %(message)s', 
                 filemode='w') 
 
+logger.setLevel(logging.DEBUG)
 logger = logging.getLogger("mcprov.main")
 
 def parse_arguments():
