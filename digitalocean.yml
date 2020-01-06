@@ -71,7 +71,20 @@
 
     - name: Allow run commands as root with dropletuser
       shell: "echo '%sudo ALL=NOPASSWD: ALL' >> /etc/sudoers"
+
+- name: Continue configuration as specified user
+  hosts: digital_ocean_droplet
+  remote_user: "{{ remote_uname }}"
+  gather_facts: False
+
+  tasks:
     
+    - set_fact:
+        remote_user: "{{ remote_uname }}"
+
+    - debug: 
+        msg: Remote user is "{{ remote_user }}"
+
     - name: Install pip on remote droplet
       apt:
         name: python3-pip 
@@ -92,22 +105,17 @@
         mode: push
         rsync_opts:
             - "--exclude=.git/"
-    
-    - name: Create manticore environment
-      become: yes
-      become_user: "{{ remote_uname }}"
-      shell:
-        mv "{{ manticore_script }}" "{{ manticore_env }}" 
 
     - name: Watch target script output (tail)
       include_role:
         name: long_run
       vars:
+        long_run_become: yes
         long_run_title: Manticore run
         long_run_output_path: "/home/{{ remote_uname }}/{{ manticore_env }}"
         long_run_output_file: manticore_run.log
         long_run_path: "/home/{{ remote_uname }}/{{ manticore_env }}"
-        long_run_cmd: cd "/home/{{ remote_uname }}/{{ manticore_env }}" && python3 "{{ manticore_script }}"
+        long_run_cmd: python3 "/home/{{ remote_uname }}/{{ manticore_script }}"
         long_run_timeout: 600
         long_run_poll: 1
 
@@ -119,5 +127,5 @@
         rsync_path: "sudo rsync"
         mode: pull
         src:  "/home/{{ remote_uname }}/{{ manticore_env }}/."
-        dest: "{{ manticore_env }}/"
+        dest: "{{ working_dir }}/{{ manticore_env }}/"
         recursive: yes
