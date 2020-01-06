@@ -14,8 +14,8 @@ logging.basicConfig(filename="mcprov.log",
     format='%(asctime)s %(message)s', 
                 filemode='w') 
 
-logger.setLevel(logging.DEBUG)
 logger = logging.getLogger("mcprov.main")
+logger.setLevel(logging.DEBUG)
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Wrapper around Manticore CLI")
@@ -34,7 +34,7 @@ def parse_arguments():
     parser.add_argument(
         "--playbook",
         type=str,
-        default="digitalocean.yml",
+        default=".mcore_config/digitalocean.yml",
         help="specify Ansible playbook"
     )
 
@@ -53,12 +53,12 @@ def parse_arguments():
 
 def main(args=None):
 
-    if not os.path.exists(".mcore_config"):
+    parsed, other = parse_arguments()
+
+    if parsed.remote and not os.path.exists(".mcore_config"):
         logger.warning("Warning: .mcore_config directory not found.")
         logger.warning("Starting initial config...")
         initial_setup()
-
-    parsed, other = parse_arguments()
 
     flags = [flag for flag in other if flag.startswith("--")]
     files = [file for file in other if not file.startswith("--")]
@@ -92,8 +92,9 @@ def main(args=None):
 
         if file_exists_as_argument:
             to_run.append("--extra-vars")
-            to_run.append("manticore_script={}".format(files[0]))
-            
+            to_run.append("manticore_script={} working_dir={}/".format(files[0], os.getcwd()))
+            to_run.append("-vvv")
+
         process = subprocess.Popen(to_run)
 
     # Allows the user to prematurely kill the subprocess with KeyboardInterrupt
