@@ -39,10 +39,17 @@ def parse_arguments():
     )
 
     parser.add_argument(
+        "--destroy",
+        action="store_const",
+        const=".mcore_config/tear_down_instance.yml",
+        help="Destroy a previously provisioned droplet",
+    )
+
+    parser.add_argument(
         "--verbosity",
         type=int,
         default=2,
-        help='Specify Ansible verbosity level (1 - 4)'
+        help="Specify Ansible verbosity level (1 - 4)"
     )
 
     parsed, other = parser.parse_known_args(sys.argv[1:])   
@@ -75,8 +82,12 @@ def main(args=None):
 
     if len(files) == 0:
         file_exists_as_argument = False
-    
-    if parsed.local:
+
+    if parsed.destroy:
+        to_run = ["ansible-playbook"]
+        to_run.append(parsed.destroy)
+
+    elif parsed.local:
 
         if not file_exists_as_argument:
             print("Error: must specify script to run")
@@ -90,8 +101,6 @@ def main(args=None):
         else:
             to_run = ["python3"]
             to_run.extend([files[0]]) 
-
-        process = subprocess.Popen(to_run)
 
     elif parsed.remote:
         to_run = ["ansible-playbook"]
@@ -108,9 +117,9 @@ def main(args=None):
                 command,
                 " ".join(flags))
             )
-            to_run.append("-{}".format(parsed.verbosity * "v"))
 
-        process = subprocess.Popen(to_run)
+    to_run.append("-{}".format(parsed.verbosity * "v"))
+    process = subprocess.Popen(to_run)
 
     # Allows the user to prematurely kill the subprocess with KeyboardInterrupt
 
