@@ -1,5 +1,5 @@
-# Manticore-Ansible
-A Python wrapper around Ansible to automatically provision Manticore both locally and in the cloud
+# Manticore Provisioner
+A Python wrapper around Ansible to automatically provision Manticore jobs both locally and in the cloud
 
 ## Variables
 
@@ -28,8 +28,9 @@ Below is a description of all variables necessary for configuration.
 * logfile: log file of manticore script that will be saved under working_dir
 
 
+## Running a job directly via `ansible-playbook`
 
-### Initial setup
+### Initial Setup
 
 (Warning: very rough and experimental)
 
@@ -41,14 +42,48 @@ Below is a description of all variables necessary for configuration.
 * In ansible.yml, change the value of the variables (droplet name, username, etc) to be as desired.
 * Run `ansible-playbook -vvv digitalocean.yml`
 
-### Tearing down the VM
+### Tearing down the droplet
 * Run `ansible-playbook -vvv tear_down_instance.yml`
 * When provisioning and tearing down multiple instances, change the value of `droplet_name` in `vars/droplet.yml` to be the respective name of the instance to destroy.
 
-### Notes / Recommendations
-* The current Ansible playbooks use the digital_ocean module, which has its roots in python 2.  As such, when installing dopy via `pip3`, a `basestr` is not defined error will occur.  To fix this, open `~/.local/lib/python3.7/site-packages/dopy/manager.py` and change all occurrences of `basestr` to `str`. 
+## Running a job via `mcorepv` (name subject to change)
+
+`mcorepv` is a python-based wrapper around Manticore CLI and Ansible that can provision jobs locally and in the cloud. It takes all known Manticore CLI flags along with a few others down below.
+
+### Installation 
+
+* Run `python3 setup.py install --user` to install mcorepv and all its dependencies.
+
+### Local provisioning
+
+Specify the `--local` flag for `mcorepv` to run a job locally.  The following denote two general usages of `mcorepv --local`
+
+* `mcorepv --local <executable_to_analyze> --<manticore_flags>`
+* `mcorepv --local <manticore_python_script>`
+
+The first command runs Manticore analysis on a binary, whereas the second runs a python script.
+
+### Remote provisioning
+
+Note: `mcorepv` config data should be stored in `.mcore_config` directory.  By default, `mcorepv` will check to see if a `.mcore_config` directory exists.  If not it will clone this git repository, allowing the user to either use default configurations or update all aforementioned [variables](https://github.com/pwang00/Ansible-Manticore/edit/master/README.md#Variables).  `mcorepv` also allows the usage of custom playbooks, which are specified with the `--playbook` flag.
+
+Specify the `--remote` flag for `mcorepv` to provision a DigitalOcean instance and run a Manticore job on the instance. The following denotes two general usage of `mcorepv` for remote jobs.
+
+* `mcorepv --remote <manticore_python_script>`
+* `mcorepv --remote <manticore_python_script> --playbook <custom_ansible_playbook>`
+
+The first command executes the default Ansible playbook in `.mcore_config`, which provisions a DigitalOcean droplet runs a Manticore python script in the cloud.  The second command executes the tasks in a custom playbook.
+
+
+### Notes / recommendations
+* The current Ansible playbooks use the digital_ocean module, which was originally developed in python 2.  As such, when installing dopy via `pip3`, a `basestr` is not defined error will occur.  To fix this, open `~/.local/lib/python3.7/site-packages/dopy/manager.py` and change all occurrences of `basestr` to `str`. 
 * As of Ansible 2.8, another module `digital_ocean_droplet` has been added, which does not require a prior `pip3 install`.  However, it has only one page of documentation (i.e. relatively poor support) and from what I've seen, is bug-ridden and error-prone. 
 
-### Known Issues
-* Sometimes if the SSH service on the droplet times out, a permission denied error will occur when re-running the `digitalocean.yml` script.  To solve this issue, run `ansible-playbook reset_ssh_key.yml -vv` to reset the SSH key on the server.
+### Areas of improvement
+
+* README currently is cluttered, should be made less verbose but get the point across.
+* `mcorepv` may still be relatively buggy and unoptimized, and requires further testing.
+
+### Known issues
+* Sometimes if the SSH service on the droplet times out, a permission denied error will occur when re-running the `digitalocean.yml` script.  To solve this issue, run `ansible-playbook reset_ssh_key.yml -vv` to reset the SSH key on the server.  As an additional restriction, the `ssh_key_name` field in `vars/droplet.yml` must be unique per user.
 * Real-time logging really only works well if the script being run takes a long time to complete and outputs a large amount of data to stdout.  As of now, there doesn't seem to be a way to increase the log output rate, but this may change in the future.
