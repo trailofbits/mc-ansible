@@ -35,7 +35,14 @@ def parse_arguments():
         "--playbook",
         type=str,
         default=".mcore_config/digitalocean.yml",
-        help="specify Ansible playbook"
+        help="Specify Ansible playbook"
+    )
+
+    parser.add_argument(
+        "--verbosity",
+        type=int,
+        default=2,
+        help='Specify Ansible verbosity level (1 - 4)'
     )
 
     parsed, other = parser.parse_known_args(sys.argv[1:])   
@@ -75,7 +82,7 @@ def main(args=None):
             print("Error: must specify script to run")
             sys.exit(1)
 
-        elif not files[0].endswith(".py"):
+        elif not files[0].endswith(".py") or files[0].endswith(".sol"):
             to_run = ["manticore"]
             to_run.extend([files[0]])
             to_run.extend(flags)
@@ -91,9 +98,18 @@ def main(args=None):
         to_run.append(parsed.playbook)
 
         if file_exists_as_argument:
+
+            command = "manticore" if not files[0].endswith(".py") else "python3"
+
             to_run.append("--extra-vars")
-            to_run.append("manticore_script={} working_dir={}/".format(files[0], os.getcwd()))
-            to_run.append("-vvv")
+            to_run.append("manticore_script={} working_dir={}/ main_cmd={} flags={}".format(
+                files[0], 
+                os.getcwd(), 
+                command,
+                " ".join(flags))
+            )
+            to_run.append("-{}".format(parsed.verbosity * "v"))
+            print(to_run)
 
         process = subprocess.Popen(to_run)
 
