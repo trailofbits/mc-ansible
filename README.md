@@ -65,7 +65,7 @@ The first command runs Manticore analysis on a binary, whereas the second runs a
 
 ### Remote provisioning
 
-Note: `mcorepv` config data should be stored in `.mcore_config` directory.  By default, `mcorepv` will check to see if a `.mcore_config` directory exists.  If not it will clone this git repository, allowing the user to either use default configurations or update all aforementioned [variables](https://github.com/pwang00/Ansible-Manticore/edit/master/README.md#Variables).  `mcorepv` also allows the usage of custom playbooks, which are specified with the `--playbook` flag.
+Note: `mcorepv` config data should be stored in `.mcore_config` directory.  By default, `mcorepv` will check to see if a `.mcore_config` directory exists.  If not it will clone this git repository, allowing the user to either use default configurations or update all aforementioned [variables](https://github.com/pwang00/Ansible-Manticore/README.md#Variables).  `mcorepv` also allows the usage of custom playbooks, which are specified with the `--playbook` flag.
 
 Specify the `--remote` flag for `mcorepv` to provision a DigitalOcean instance and run a Manticore job on the instance. The following denotes two general usage of `mcorepv` for remote jobs.
 
