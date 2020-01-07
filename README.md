@@ -21,13 +21,13 @@ Below is a description of all variables necessary for configuration.
 
 `ansible.yml` holds user-oriented variables for the provisioned DigitalOcean droplet instance.
 
-* manticore_env: directory in which manticore scripts will be run
+* manticore_env: directory in which Manticore scripts will be run
 * manticore_script: script inside of manticore_env to run
 * remote_uname: username on the droplet
 * working_dir: current working directory on local machine
-* logfile: log file of manticore script that will be saved under working_dir
+* logfile: log file of Manticore script that will be saved under working_dir
 * main_cmd: command to run on remote droplet (i.e. `manticore` or `python3`)
-* flags: flags to pass into manticore on remote droplet
+* flags: flags to pass into Manticore on remote droplet
 
 ## Running a job directly via `ansible-playbook`
 
@@ -75,7 +75,7 @@ Specify the `--remote` flag for `mcorepv` to provision a DigitalOcean instance a
 * `mcorepv --remote <binary_to_analyze> --verbosity 3`
 * `mcorepv --remote <contract_to_analyze> contract.sol --txaccount attacker`
 
-The first command executes the default Ansible playbook in `.mcore_config`, which provisions a DigitalOcean droplet runs a Manticore python script in the cloud.  The second command executes the tasks in a custom playbook.
+The first command executes the default Ansible playbook in `.mcore_config`, which provisions a DigitalOcean droplet runs a Manticore python script in the cloud.  The second command executes the tasks in a custom playbook.  The third and fourth commands demonstrate verbosity configuration and the passing of known flags to Manticore on the remote droplet.
 
 
 ### Notes / recommendations
