@@ -109,7 +109,6 @@ def main(args=None):
                 " ".join(flags))
             )
             to_run.append("-{}".format(parsed.verbosity * "v"))
-            print(to_run)
 
         process = subprocess.Popen(to_run)
 
