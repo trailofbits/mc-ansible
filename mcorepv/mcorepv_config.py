@@ -13,6 +13,8 @@ ansible_vars = {
 	"remote_uname": None,
 	"working_dir": "{{ lookup('env','PWD') }}",
 	"logfile": None,
+	"main_cmd": None,
+	"flags": None
 }
 
 digitalocean_vars = {
