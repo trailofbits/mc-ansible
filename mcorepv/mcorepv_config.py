@@ -26,7 +26,8 @@ def initial_setup():
 
 	print(f".mcore_config directory not found, cloning from {repo_url}")
 
-	git.Repo.clone_from(repo_url, '.mcore_config', 
+	if not os.path.exists(".mcore_config"):
+		git.Repo.clone_from(repo_url, '.mcore_config', 
 	        branch='master')
 
 	if input("Use default configuration? (y/n) ").lower() == "n":

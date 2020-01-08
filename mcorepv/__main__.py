@@ -69,7 +69,7 @@ def main(args=None):
 
     parsed, other = parse_arguments()
 
-    if parsed.remote and not os.path.exists(".mcore_config"):
+    if parsed.remote:
         logger.warning("Warning: .mcore_config directory not found.")
         logger.warning("Starting initial config...")
         initial_setup()
