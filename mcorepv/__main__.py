@@ -74,7 +74,6 @@ def main(args=None):
         logger.warning("Starting initial config...")
         initial_setup()
 
-    flags = [flag for flag in other if flag.startswith("--")]
     files = [file for file in other if not file.startswith("--")]
 
     process = None
@@ -95,12 +94,13 @@ def main(args=None):
 
         elif not files[0].endswith(".py") or files[0].endswith(".sol"):
             to_run = ["manticore"]
-            to_run.extend([files[0]])
-            to_run.extend(flags)
-
+            to_run.extend(other)
+            
         else:
             to_run = ["python3"]
-            to_run.extend([files[0]]) 
+            to_run.append(files[0])
+
+        print(to_run)
 
     elif parsed.remote:
         to_run = ["ansible-playbook"]
@@ -111,14 +111,18 @@ def main(args=None):
             command = "manticore" if not files[0].endswith(".py") else "python3"
 
             to_run.append("--extra-vars")
-            to_run.append("manticore_script={} working_dir={}/ main_cmd={} flags={}".format(
-                files[0], 
+
+            if command == "python3":
+                other = files[0]
+
+            to_run.append("manticore_script={} working_dir={}/ main_cmd={}".format(
+                " ".join(other), 
                 os.getcwd(), 
-                command,
-                " ".join(flags))
+                command)
             )
 
-    to_run.append("-{}".format(parsed.verbosity * "v"))
+        to_run.append("-{}".format(parsed.verbosity * "v"))
+
     process = subprocess.Popen(to_run)
 
     # Allows the user to prematurely kill the subprocess with KeyboardInterrupt

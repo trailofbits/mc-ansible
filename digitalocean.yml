@@ -117,7 +117,7 @@
         long_run_output_path: "/home/{{ remote_uname }}/{{ manticore_env }}"
         long_run_output_file: manticore_run.log
         long_run_path: "/home/{{ remote_uname }}/{{ manticore_env }}"
-        long_run_cmd: "{{ main_cmd }} /home/{{ remote_uname }}/{{ manticore_script }} {{ flags }}"
+        long_run_cmd: "{{ main_cmd }} /home/{{ remote_uname }}/{{ manticore_script }}"
         long_run_timeout: 600
         long_run_poll: 1
       tags: [print_action]
