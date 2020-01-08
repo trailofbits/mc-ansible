@@ -100,8 +100,6 @@ def main(args=None):
             to_run = ["python3"]
             to_run.append(files[0])
 
-        print(to_run)
-
     elif parsed.remote:
         to_run = ["ansible-playbook"]
         to_run.append(parsed.playbook)
@@ -122,7 +120,6 @@ def main(args=None):
             )
 
         to_run.append("-{}".format(parsed.verbosity * "v"))
-        print(to_run)
 
     process = subprocess.Popen(to_run)
 
