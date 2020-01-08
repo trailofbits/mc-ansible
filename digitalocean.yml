@@ -1,3 +1,5 @@
+
+
 # DigitalOcean Playbook
 ---
 - name: DigitalOcean
@@ -72,6 +74,17 @@
     - name: Allow run commands as root with dropletuser
       shell: "echo '%sudo ALL=NOPASSWD: ALL' >> /etc/sudoers"
 
+    - name: Install pip on remote droplet
+      become: yes
+      apt:
+        name: python3-pip 
+        state: present
+        update_cache: yes
+
+    - name: Install manticore on remote droplet
+      pip: 
+        name: manticore[native]
+
 - name: Continue configuration as specified user
   hosts: digital_ocean_droplet
   remote_user: "{{ remote_uname }}"
@@ -84,17 +97,6 @@
 
     - debug: 
         msg: Remote user is "{{ remote_user }}"
-
-    - name: Install pip on remote droplet
-      become: yes
-      apt:
-        name: python3-pip 
-        state: present
-        update_cache: yes
-
-    - name: Install manticore on remote droplet
-      pip: 
-        name: manticore[native]
 
     - name: Copy cwd to remote droplet
       become: yes
