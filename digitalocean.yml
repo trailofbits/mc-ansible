@@ -106,8 +106,6 @@
         dest: "/home/{{ remote_uname }}/"
         dirs: yes
         mode: push
-        rsync_opts:
-            - "--exclude=.git/"
 
     - name: Watch target script output (tail)
       include_role:

@@ -113,7 +113,7 @@ def main(args=None):
             to_run.append("--extra-vars")
 
             if command == "python3":
-                other = files[0]
+                other = [files[0]]
 
             to_run.append("manticore_script={} working_dir={}/ main_cmd={}".format(
                 " ".join(other), 
@@ -122,6 +122,7 @@ def main(args=None):
             )
 
         to_run.append("-{}".format(parsed.verbosity * "v"))
+        print(to_run)
 
     process = subprocess.Popen(to_run)
 

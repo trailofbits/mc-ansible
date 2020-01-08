@@ -21,7 +21,7 @@ digitalocean_vars = {
 	"ssh_key_name": None,
 	"droplet_region": None,
 	"droplet_size": None,
-	"droplet_name": None
+	"droplet_name": None,
 	"droplet_ssh_key": "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_ed25519.pub') }}"
 
 }
@@ -45,7 +45,7 @@ def initial_setup():
 		for var in digitalocean_vars.keys():
 
 			if var == "droplet_ssh_key":
-				digitalocean_vars[var] = "{{ lookup('file', lookup('env','HOME') + " input(f"{var}: ") + ")}}"
+				digitalocean_vars[var] = "{{ lookup('file', lookup('env','HOME')" +  input(f"{var}: ") + ")}}"
 			else:
 				digitalocean_vars[var] = input(f"{var}: ")
 
