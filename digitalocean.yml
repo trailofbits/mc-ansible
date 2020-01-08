@@ -86,6 +86,7 @@
         msg: Remote user is "{{ remote_user }}"
 
     - name: Install pip on remote droplet
+      become: yes
       apt:
         name: python3-pip 
         state: present
