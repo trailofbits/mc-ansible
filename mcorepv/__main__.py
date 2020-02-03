@@ -10,32 +10,27 @@ import logging
 
 from .mcorepv_config import initial_setup
 
-logging.basicConfig(filename="mcprov.log", 
-    format='%(asctime)s %(message)s', 
-                filemode='w') 
+logging.basicConfig(
+    filename="mcprov.log", format="%(asctime)s %(message)s", filemode="w"
+)
 
 logger = logging.getLogger("mcprov.main")
 logger.setLevel(logging.DEBUG)
+
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Wrapper around Manticore CLI")
     destination = parser.add_argument_group("destination flags (local, remote)")
 
-    destination.add_argument(
-        "--local",
-        action="store_true"
-    )
+    destination.add_argument("--local", action="store_true")
 
-    destination.add_argument(
-        "--remote",
-        action="store_true"
-    )
+    destination.add_argument("--remote", action="store_true")
 
     parser.add_argument(
         "--playbook",
         type=str,
         default=".mcore_config/digitalocean.yml",
-        help="Specify Ansible playbook"
+        help="Specify Ansible playbook",
     )
 
     parser.add_argument(
@@ -49,10 +44,10 @@ def parse_arguments():
         "--verbosity",
         type=int,
         default=2,
-        help="Specify Ansible verbosity level (1 - 4)"
+        help="Specify Ansible verbosity level (1 - 4)",
     )
 
-    parsed, other = parser.parse_known_args(sys.argv[1:])   
+    parsed, other = parser.parse_known_args(sys.argv[1:])
 
     if not len(sys.argv[1:]) > 0:
         print("Error: argv must be nonempty")
@@ -95,7 +90,7 @@ def main(args=None):
         elif not files[0].endswith(".py") or files[0].endswith(".sol"):
             to_run = ["manticore"]
             to_run.extend(other)
-            
+
         else:
             to_run = ["python3"]
             to_run.append(files[0])
@@ -113,10 +108,10 @@ def main(args=None):
             if command == "python3":
                 other = [files[0]]
 
-            to_run.append("manticore_script={} working_dir={}/ main_cmd={}".format(
-                " ".join(other), 
-                os.getcwd(), 
-                command)
+            to_run.append(
+                "manticore_script={} working_dir={}/ main_cmd={}".format(
+                    " ".join(other), os.getcwd(), command
+                )
             )
 
         to_run.append("-{}".format(parsed.verbosity * "v"))
