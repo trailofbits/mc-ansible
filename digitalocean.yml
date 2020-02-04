@@ -20,26 +20,26 @@
       oauth_token: "{{ digital_ocean_api_token }}"
 
   - name: Upload SSH key
-    digital_ocean:
+    digital_ocean_sshkey:
       state: present
-      command: ssh
       name: "{{ ssh_key_name }}"
       ssh_pub_key: "{{ droplet_ssh_key }}"
-      api_token: "{{ digital_ocean_api_token }}"
+      oauth_token: "{{ digital_ocean_api_token }}"
     register: do_ssh_key
   
   - name: Create Droplet
-    digital_ocean:
+    digital_ocean_droplet:
       state: present
-      command: droplet
       name: "{{ droplet_name }}"
-      api_token: "{{ digital_ocean_api_token }}"
-      size_id: "{{ droplet_size }}"
-      region_id: "{{ droplet_region }}"
-      image_id: "{{ droplet_image }}"
-      ssh_key_ids: "{{ do_ssh_key.ssh_key.id }}"
-      unique_name: yes
-      wait_timeout: 500
+      oauth_token: "{{ digital_ocean_api_token }}"
+      size: "{{ droplet_size }}"
+      region: "{{ droplet_region }}"
+      image: "{{ droplet_image }}"
+      ssh_keys: "{{ do_ssh_key.ssh_key.id }}"
+      unique_name: true
+      wait_timeout: 300
+      tags:
+        - Ansible:Manticore
     register: droplet_info
 
   - name: Add new instance to host group

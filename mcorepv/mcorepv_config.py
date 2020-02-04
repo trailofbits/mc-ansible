@@ -74,7 +74,7 @@ def initial_setup():
         "working_dir": "{{ lookup('env','PWD') }}",
         "logfile": "{{ working_dir }}/manticore_logs",
         "main_cmd": "manticore",
-        "digital_ocean_api_token": "{{ lookup('env', 'DO_TOKEN') }} # Grab token from DO_TOKEN environment variable",
+        "digital_ocean_api_token": "",
         "droplet_region": "nyc1",
         "droplet_size": "512mb",
         "droplet_image": "ubuntu-18-04-x64",
