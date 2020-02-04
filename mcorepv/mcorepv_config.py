@@ -45,7 +45,7 @@ def create_config_file(target, existing_vars):
             )
             vars_internal[var] = f"{{{{ lookup('file', '{fn}') }}}}"
         elif var in skip:
-            pass
+            vars_internal = existing_vars[var]
         else:
             vars_internal[var] = prompt(
                 f"{prompts.get(var, var)}: ", default=existing_vars[var]
