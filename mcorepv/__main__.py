@@ -93,10 +93,10 @@ def main(parsed=parse_arguments()):
             yaml.dump(ansible_config, ansiblef, default_flow_style=False)
 
     if parsed.teardown:
-        to_run = ["ansible-playbook", str(curdir.joinpath("tear_down_instance.yml"))]
+        to_run = ["ansible-playbook", "--inventory", str(curdir.joinpath("hosts")), str(curdir.joinpath("tear_down_instance.yml"))]
 
     elif parsed.playbook:
-        to_run = ["ansible-playbook", str(curdir.joinpath(parsed.playbook))]
+        to_run = ["ansible-playbook", "--inventory", str(curdir.joinpath("hosts")), str(curdir.joinpath(parsed.playbook))]
 
     if parsed.local or parsed.remote:
         assert (
@@ -111,7 +111,7 @@ def main(parsed=parse_arguments()):
         to_run.extend(parsed.args)
 
     elif parsed.remote:
-        to_run = ["ansible-playbook", str(curdir.joinpath(parsed.playbook))]
+        to_run = ["ansible-playbook", "--inventory", str(curdir.joinpath("hosts")), str(curdir.joinpath(parsed.playbook))]
 
         if parsed.args:
             is_py_file = file.endswith(".py")
