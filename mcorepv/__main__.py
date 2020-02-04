@@ -122,7 +122,7 @@ def main(parsed=parse_arguments()):
 
             to_run.append(
                 "manticore_script={} working_dir={}/ main_cmd={}".format(
-                    " ".join(parsed_args), str(Path.cwd()), command
+                    " ".join(parsed.args), str(Path.cwd()), command
                 )
             )
 
