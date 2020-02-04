@@ -35,7 +35,7 @@
       size: "{{ droplet_size }}"
       region: "{{ droplet_region }}"
       image: "{{ droplet_image }}"
-      ssh_keys: "{{ do_ssh_key.ssh_key.id }}"
+      ssh_keys: "{{ do_ssh_key.id }}"
       unique_name: true
       wait_timeout: 300
       tags:
