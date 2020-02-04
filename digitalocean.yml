@@ -43,10 +43,10 @@
     register: droplet_info
 
   - name: Add new instance to host group
-    add_host: hostname={{ droplet_info.data.droplet.ip_address }} groupname=digital_ocean_droplet
+    add_host: hostname={{ droplet_info.data.ip_address }} groupname=digital_ocean_droplet
 
   - name: Wait for SSH to come up
-    wait_for: host={{ droplet_info.data.droplet.ip_address }} port=22 delay=10 timeout=60 state=started
+    wait_for: host={{ droplet_info.data.ip_address }} port=22 delay=10 timeout=60 state=started
 
 - name: Configure manticore instance
   hosts: digital_ocean_droplet
