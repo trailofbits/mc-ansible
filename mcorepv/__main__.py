@@ -87,9 +87,9 @@ def main(parsed=parse_arguments()):
             ansible_config[var] = user_config.get(var, ansible_config[var])
 
         with open(curdir.joinpath("vars", "droplet.yml"), "w") as dropf:
-            yaml.dump(droplet_config, dropf)
+            yaml.dump(droplet_config, dropf, default_flow_style=False)
         with open(curdir.joinpath("vars", "ansible.yml"), "w") as ansiblef:
-            yaml.dump(ansible_config, ansiblef)
+            yaml.dump(ansible_config, ansiblef, default_flow_style=False)
 
     if parsed.teardown:
         to_run = ["ansible-playbook", str(curdir.joinpath("tear_down_instance.yml"))]
