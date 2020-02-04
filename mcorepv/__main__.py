@@ -97,12 +97,13 @@ def main(parsed=parse_arguments()):
     elif parsed.playbook:
         to_run = ["ansible-playbook", str(curdir.joinpath(parsed.playbook))]
 
-    assert (
-        parsed.args
-    ), "--remote and --local options require arguments to be specified after `--`"
-    if parsed.args[0] == "--":
-        parsed.args = parsed.args[1:]
-    file = parsed.args[0]
+    else:
+        assert (
+            parsed.args
+        ), "--remote and --local options require arguments to be specified after `--`"
+        if parsed.args[0] == "--":
+            parsed.args = parsed.args[1:]
+        file = parsed.args[0]
 
     if parsed.local:
         to_run = ["python"] if file.endswith(".py") else ["manticore"]
