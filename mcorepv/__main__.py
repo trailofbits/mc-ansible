@@ -120,11 +120,9 @@ def main(parsed=parse_arguments()):
 
             to_run.append("--extra-vars")
 
-            args = parsed.args[1:] if is_py_file else parsed.args
-
             to_run.append(
                 "manticore_script={} working_dir={}/ main_cmd={}".format(
-                    " ".join(args), str(Path.cwd()), command
+                    " ".join(parsed_args), str(Path.cwd()), command
                 )
             )
 
