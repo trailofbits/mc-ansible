@@ -98,7 +98,7 @@ def main(parsed=parse_arguments()):
     elif parsed.playbook:
         to_run = ["ansible-playbook", str(curdir.joinpath(parsed.playbook))]
 
-    else:
+    if parsed.local or parsed.remote:
         assert (
             parsed.args
         ), "--remote and --local options require arguments to be specified after `--`"
