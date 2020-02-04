@@ -126,7 +126,7 @@ def main(parsed=parse_arguments()):
                 )
             )
 
-        to_run.append("-{}".format(parsed.verbosity * "v"))
+        to_run.append("-{}".format(parsed.v * "v"))
 
     process = subprocess.Popen(to_run)
 
