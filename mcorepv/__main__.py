@@ -74,22 +74,22 @@ def main(parsed=parse_arguments()):
 
     if parsed.config:
         initial_setup()
-        print("Wrote config file, exiting")
         exit(0)
 
-    user_config = load_config_file(Path.cwd().joinpath(".mcorepv_config"))
-    droplet_config = load_config_file(curdir.joinpath("vars", "droplet.yml"))
-    ansible_config = load_config_file(curdir.joinpath("vars", "ansible.yml"))
+    if parsed.remote or parsed.teardown:
+        user_config = load_config_file(Path.cwd().joinpath(".mcorepv_config"))
+        droplet_config = load_config_file(curdir.joinpath("vars", "droplet.yml"))
+        ansible_config = load_config_file(curdir.joinpath("vars", "ansible.yml"))
 
-    for var in droplet_config:
-        droplet_config[var] = user_config.get(var, droplet_config[var])
-    for var in ansible_config:
-        ansible_config[var] = user_config.get(var, ansible_config[var])
+        for var in droplet_config:
+            droplet_config[var] = user_config.get(var, droplet_config[var])
+        for var in ansible_config:
+            ansible_config[var] = user_config.get(var, ansible_config[var])
 
-    with open(curdir.joinpath("vars", "droplet.yml"), "w") as dropf:
-        yaml.dump(droplet_config, dropf)
-    with open(curdir.joinpath("vars", "ansible.yml"), "w") as ansiblef:
-        yaml.dump(ansible_config, ansiblef)
+        with open(curdir.joinpath("vars", "droplet.yml"), "w") as dropf:
+            yaml.dump(droplet_config, dropf)
+        with open(curdir.joinpath("vars", "ansible.yml"), "w") as ansiblef:
+            yaml.dump(ansible_config, ansiblef)
 
     if parsed.teardown:
         to_run = ["ansible-playbook", str(curdir.joinpath("tear_down_instance.yml"))]
@@ -103,11 +103,6 @@ def main(parsed=parse_arguments()):
     if parsed.args[0] == "--":
         parsed.args = parsed.args[1:]
     file = parsed.args[0]
-    assert Path(
-        file
-    ).is_file(), (
-        "First argument after `--` needs to be a Python file or Manticore target"
-    )
 
     if parsed.local:
         to_run = ["python"] if file.endswith(".py") else ["manticore"]

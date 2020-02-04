@@ -51,6 +51,7 @@ def create_config_file(target, existing_vars):
     with open(target, "w") as outf:
         yaml.dump(vars_internal, outf, default_flow_style=False)
 
+    print("Config file saved to", target)
     return vars_internal
 
 
