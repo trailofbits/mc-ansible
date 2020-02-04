@@ -103,7 +103,11 @@ def main(parsed=parse_arguments()):
     if parsed.args[0] == "--":
         parsed.args = parsed.args[1:]
     file = parsed.args[0]
-    assert Path(file).is_file(), "First argument after `--` needs to be a Python file or Manticore target"
+    assert Path(
+        file
+    ).is_file(), (
+        "First argument after `--` needs to be a Python file or Manticore target"
+    )
 
     if parsed.local:
         to_run = ["python"] if file.endswith(".py") else ["manticore"]
