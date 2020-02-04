@@ -103,7 +103,7 @@
       become_user: "{{ remote_uname }}"
       synchronize: 
         src: "{{ working_dir }}"
-        dest: "/home/{{ remote_uname }}/"
+        dest: "/home/{{ remote_uname }}/{{ manticore_env }}"
         dirs: yes
         mode: push
 
@@ -114,7 +114,7 @@
         long_run_title: Manticore run
         long_run_output_path: "/home/{{ remote_uname }}/{{ manticore_env }}"
         long_run_output_file: manticore_run.log
-        long_run_path: "/home/{{ remote_uname }}"
+        long_run_path: "/home/{{ remote_uname }}/{{ manticore_env }}"
         long_run_cmd: "{{ main_cmd }} /home/{{ remote_uname }}/{{ manticore_script }}"
         long_run_timeout: 600
         long_run_poll: 1
