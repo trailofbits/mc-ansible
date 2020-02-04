@@ -107,7 +107,7 @@ def main(parsed=parse_arguments()):
         file = parsed.args[0]
 
     if parsed.local:
-        to_run = ["python"] if file.endswith(".py") else ["manticore"]
+        to_run = ["python3"] if file.endswith(".py") else ["manticore"]
         to_run.extend(parsed.args)
 
     elif parsed.remote:
@@ -116,7 +116,7 @@ def main(parsed=parse_arguments()):
         if parsed.args:
             is_py_file = file.endswith(".py")
 
-            command = "python" if is_py_file else "manticore"
+            command = "python3" if is_py_file else "manticore"
 
             to_run.append("--extra-vars")
 
