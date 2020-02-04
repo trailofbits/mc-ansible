@@ -2,13 +2,13 @@
 """ Python wrapper built around supporting Manticore functionality"""
 
 import argparse
-import sys
+import yaml
 import subprocess
-import os
 import time
 import logging
+from pathlib import Path
 
-from .mcorepv_config import initial_setup
+from .mcorepv_config import initial_setup, load_config_file
 
 logging.basicConfig(
     filename="mcprov.log", format="%(asctime)s %(message)s", filemode="w"
@@ -17,100 +17,113 @@ logging.basicConfig(
 logger = logging.getLogger("mcprov.main")
 logger.setLevel(logging.DEBUG)
 
+curdir = Path(__file__).parent.parent
+
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Wrapper around Manticore CLI")
-    destination = parser.add_argument_group("destination flags (local, remote)")
 
-    destination.add_argument("--local", action="store_true")
+    group = parser.add_mutually_exclusive_group(required=True)
 
-    destination.add_argument("--remote", action="store_true")
-
-    parser.add_argument(
+    group.add_argument(
+        "-l", "--local", action="store_true", help="Run Manticore on the local machine"
+    )
+    group.add_argument(
+        "-r",
+        "--remote",
+        action="store_true",
+        help="Run Manticore on the remote machine",
+    )
+    group.add_argument(
         "--playbook",
         type=str,
-        default=".mcore_config/digitalocean.yml",
-        help="Specify Ansible playbook",
+        default="digitalocean.yml",
+        help="Manually run one of the Ansible playbooks",
     )
-
-    parser.add_argument(
-        "--destroy",
-        action="store_const",
-        const=".mcore_config/tear_down_instance.yml",
+    group.add_argument(
+        "--teardown",
+        action="store_true",
         help="Destroy a previously provisioned droplet",
     )
-
-    parser.add_argument(
-        "--verbosity",
-        type=int,
-        default=2,
-        help="Specify Ansible verbosity level (1 - 4)",
+    group.add_argument(
+        "--config", action="store_true", help="Rebuild the local config file"
     )
 
-    parsed, other = parser.parse_known_args(sys.argv[1:])
+    parser.add_argument(
+        "-v",
+        action="count",
+        default=1,
+        help="Specify Ansible verbosity level from -v to -vvvv",
+    )
 
-    if not len(sys.argv[1:]) > 0:
-        print("Error: argv must be nonempty")
-        sys.exit(1)
+    parser.add_argument(
+        "args", nargs=argparse.REMAINDER, help="Arguments to be passed to Manticore"
+    )
+    parsed = parser.parse_args()
 
-    if parsed.local ^ parsed.remote != 1:
-        print("Error: must specify exactly one of --remote or --local flags")
-        sys.exit(1)
-
-    return parsed, other
+    return parsed
 
 
-def main(args=None):
+def main(parsed=parse_arguments()):
 
-    parsed, other = parse_arguments()
-
-    if parsed.remote and not os.path.exists(".mcore_config"):
-        logger.warning("Warning: .mcore_config directory not found.")
-        logger.warning("Starting initial config...")
+    if (parsed.remote or parsed.teardown) and not Path.cwd().joinpath(
+        ".mcorepv_config"
+    ).exists():
+        logger.warning("Creating config file...")
         initial_setup()
 
-    files = [file for file in other if not file.startswith("--")]
+    if parsed.config:
+        initial_setup()
+        print("Wrote config file, exiting")
+        exit(0)
 
-    process = None
-    file_exists_as_argument = True
+    user_config = load_config_file(Path.cwd().joinpath(".mcorepv_config"))
+    droplet_config = load_config_file(curdir.joinpath("vars", "droplet.yml"))
+    ansible_config = load_config_file(curdir.joinpath("vars", "ansible.yml"))
 
-    if len(files) == 0:
-        file_exists_as_argument = False
+    for var in droplet_config:
+        droplet_config[var] = user_config.get(var, droplet_config[var])
+    for var in ansible_config:
+        ansible_config[var] = user_config.get(var, ansible_config[var])
 
-    if parsed.destroy:
-        to_run = ["ansible-playbook"]
-        to_run.append(parsed.destroy)
+    with open(curdir.joinpath("vars", "droplet.yml"), "w") as dropf:
+        yaml.dump(droplet_config, dropf)
+    with open(curdir.joinpath("vars", "ansible.yml"), "w") as ansiblef:
+        yaml.dump(ansible_config, ansiblef)
 
-    elif parsed.local:
+    if parsed.teardown:
+        to_run = ["ansible-playbook", str(curdir.joinpath("tear_down_instance.yml"))]
 
-        if not file_exists_as_argument:
-            print("Error: must specify script to run")
-            sys.exit(1)
+    elif parsed.playbook:
+        to_run = ["ansible-playbook", str(curdir.joinpath(parsed.playbook))]
 
-        elif not files[0].endswith(".py") or files[0].endswith(".sol"):
-            to_run = ["manticore"]
-            to_run.extend(other)
+    assert (
+        parsed.args
+    ), "--remote and --local options require arguments to be specified after `--`"
+    if parsed.args[0] == "--":
+        parsed.args = parsed.args[1:]
+    file = parsed.args[0]
+    assert Path(file).is_file(), "First argument after `--` needs to be a Python file or Manticore target"
 
-        else:
-            to_run = ["python3"]
-            to_run.append(files[0])
+    if parsed.local:
+        to_run = ["python"] if file.endswith(".py") else ["manticore"]
+        to_run.extend(parsed.args)
 
     elif parsed.remote:
-        to_run = ["ansible-playbook"]
-        to_run.append(parsed.playbook)
+        to_run = ["ansible-playbook", str(curdir.joinpath(parsed.playbook))]
 
-        if file_exists_as_argument:
+        if parsed.args:
+            is_py_file = file.endswith(".py")
 
-            command = "manticore" if not files[0].endswith(".py") else "python3"
+            command = "python" if is_py_file else "manticore"
 
             to_run.append("--extra-vars")
 
-            if command == "python3":
-                other = [files[0]]
+            args = parsed.args[1:] if is_py_file else parsed.args
 
             to_run.append(
                 "manticore_script={} working_dir={}/ main_cmd={}".format(
-                    " ".join(other), os.getcwd(), command
+                    " ".join(args), str(Path.cwd()), command
                 )
             )
 

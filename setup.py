@@ -7,6 +7,6 @@ setup(
     packages=["mcorepv"],
     author="pwang00",
     python_requires=">=3.6",
-    install_requires=["manticore", "ansible>=2.8", "gitpython"],
+    install_requires=["manticore", "ansible>=2.8", "prompt-toolkit"],
     entry_points={"console_scripts": ["mcorepv = mcorepv.__main__:main"]},
 )
