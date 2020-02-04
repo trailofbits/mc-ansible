@@ -65,8 +65,9 @@ def parse_arguments():
 
 
 def main(parsed=parse_arguments()):
+    involves_ansible = parsed.remote or parsed.teardown or parsed.playbook
 
-    if (parsed.remote or parsed.teardown) and not Path.cwd().joinpath(
+    if involves_ansible and not Path.cwd().joinpath(
         ".mcorepv_config"
     ).exists():
         logger.warning("Creating config file...")
@@ -76,7 +77,7 @@ def main(parsed=parse_arguments()):
         initial_setup()
         exit(0)
 
-    if parsed.remote or parsed.teardown:
+    if involves_ansible:
         user_config = load_config_file(Path.cwd().joinpath(".mcorepv_config"))
         droplet_config = load_config_file(curdir.joinpath("vars", "droplet.yml"))
         ansible_config = load_config_file(curdir.joinpath("vars", "ansible.yml"))

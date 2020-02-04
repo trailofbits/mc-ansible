@@ -40,7 +40,10 @@ def create_config_file(target, existing_vars):
             sshdir = Path.home().joinpath(".ssh")
             keys = list(glob.glob(str(sshdir.joinpath("*.pub"))))
             assert keys, "No SSH public keys found in ~/.ssh"
-            vars_internal[var] = prompt(f"{prompts.get(var, var)}: ", default=keys[0])
+            fn = prompt(
+                f"{prompts.get(var, var)}: ", default=keys[0]
+            )
+            vars_internal[var] = f"{{{{ lookup('file', '{fn}') }}}}"
         elif var in skip:
             pass
         else:
