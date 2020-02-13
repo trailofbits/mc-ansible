@@ -7,6 +7,13 @@ setup(
     packages=["mcorepv"],
     author="pwang00",
     python_requires=">=3.6",
-    install_requires=["manticore", "ansible>=2.8", "prompt-toolkit"],
+    install_requires=[
+        "manticore",
+        "ansible>=2.8",
+        "prompt-toolkit",
+        "npyscreen",
+        "protobuf",
+        "drawille",
+    ],
     entry_points={"console_scripts": ["mcorepv = mcorepv.__main__:main"]},
 )
