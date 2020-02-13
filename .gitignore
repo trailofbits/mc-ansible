@@ -131,4 +131,6 @@ dmypy.json
 # Pycharm
 .idea/
 
+# Generated files
 .mcorepv_config
+mcore_tui_logs
