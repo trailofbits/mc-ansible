@@ -91,11 +91,11 @@
   gather_facts: False
 
   tasks:
-    
+
     - set_fact:
         remote_user: "{{ remote_uname }}"
 
-    - debug: 
+    - debug:
         msg: Remote user is "{{ remote_user }}"
 
     - name: Copy cwd to remote droplet
@@ -107,21 +107,16 @@
         dirs: yes
         mode: push
 
-    - name: Watch target script output (tail)
-      include_role:
-        name: long_run
-      vars:
-        long_run_title: Manticore run
-        long_run_output_path: "/home/{{ remote_uname }}/{{ manticore_env }}"
-        long_run_output_file: manticore_run.log
-        long_run_path: "/home/{{ remote_uname }}/{{ manticore_env }}"
-        long_run_cmd: "{{ main_cmd }} /home/{{ remote_uname }}/{{ manticore_script }}"
-        long_run_timeout: 600
-        long_run_poll: 1
-      tags: [print_action]
+    - name: Run target script asynchronously
+      become: yes
+      become_user: "{{ remote_uname }}"
+      shell: |
+        cd "/home/{{ remote_uname }}/{{ manticore_env }}"
+        python3 "{{ manticore_script }}"
+      register: log_output
 
-   #- name: Save logs
-   #  local_action: copy content={{ log_output }} dest={{ logfile }}
+    - name: Save logs
+      local_action: copy content={{ log_output }} dest={{ logfile }}
 
     - name: Fetch manticore results from remote server
       synchronize:
