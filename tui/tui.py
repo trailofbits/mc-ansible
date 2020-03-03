@@ -186,9 +186,6 @@ def fetch_update():
                         log_buffer.extend(formatted)
                         logger.info("Deserialized LogMessage")
 
-                    if len(m.messages) == 0:
-                        raise TypeError
-
             except DecodeError:
                 logger.info("Unable to deserialize message, malformed response")
 
