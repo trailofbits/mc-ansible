@@ -85,4 +85,4 @@ With two terminal windows open:
 * Run `python3 tui.py` in another
 * Observe
 
-![TUI Image](https://raw.githubusercontent.com/trailofbits/mc-ansible/master/tui.png)
+![TUI Image](https://raw.githubusercontent.com/trailofbits/mc-ansible/master/tui/tui.png)
