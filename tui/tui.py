@@ -129,56 +129,21 @@ def fetch_update():
     while not finished:
         try:
             # Attempts to (re)connect to manticore server
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            log_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             logger.debug("Connecting to %s:%s", HOST, PORT)
-            sock.connect((HOST, PORT))
+            log_sock.connect((HOST, PORT))
             logger.info("Connected to %s:%s", HOST, PORT)
 
-            # Uses Python select module with timeout 0 to determine whether or not sockets have any data
-            # To be read from or written to to prevent client send/recv operations from blocking.
             read_sockets, write_sockets, error_sockets = select.select(
-                [sock], [], [], 60
+                [log_sock], [], [], 60
             )
 
-            # If there are sockets available for reading, deserialize data
             serialized = b""
             if read_sockets:
                 serialized = read_sockets[0].recv(10000)
                 logger.info("Pulled {} bytes".format(len(serialized)))
 
-            # Protobuf can't directly determine the type of data being received, so we use the following workaround
-            # We first try to deserialize data as a StateList object and check its .states attribute
-            # Since in practice a StateList must contain at least one state, we know that if len(.states) is 0
-            # Then the deserialized message can't be a StateList.  We then try deserializing into a MessageList object
-            # and check its .messages attribute.  If len(.messages) is empty, then we conclude that the data sent
-            # was corrupted or incorrectly serialized.
-            try:
-                m = StateList()
-                m.ParseFromString(serialized)
-
-                if len(m.states) > 0:
-                    with state_lock:
-                        new_model = {
-                            "ready": [],
-                            "busy": [],
-                            "killed": [],
-                            "terminated": [],
-                        }
-                        mapping = {
-                            State.READY: "ready",
-                            State.BUSY: "busy",
-                            State.KILLED: "killed",
-                            State.TERMINATED: "terminated",
-                        }
-                        for st in m.states:
-                            for k in mapping:
-                                if st.type == k:
-                                    new_model[mapping[k]].append(st)
-                        global state_model
-                        state_model = new_model
-
-                    logger.info("Rendered states")
-                else:
+                try:
                     m = MessageList()
                     m.ParseFromString(serialized)
                     with log_lock:
@@ -186,13 +151,68 @@ def fetch_update():
                         log_buffer.extend(formatted)
                         logger.info("Deserialized LogMessage")
 
-            except DecodeError:
-                logger.info("Unable to deserialize message, malformed response")
+                except DecodeError:
+                    logger.info("Unable to deserialize message, malformed response")
 
-            sock.shutdown(socket.SHUT_RDWR)
+            read_sockets[0].shutdown(socket.SHUT_RDWR)
+
         except socket.error:
-            logger.warning("Socket disconnected")
-            sock.close()
+            logger.warning("Log Socket disconnected")
+            log_sock.close()
+
+        try:
+            # Attempts to (re)connect to manticore server
+            state_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            logger.debug("Connecting to %s:%s", HOST, PORT + 1)
+            state_sock.connect((HOST, PORT + 1))
+            logger.info("Connected to %s:%s", HOST, PORT + 1)
+
+            read_sockets, write_sockets, error_sockets = select.select(
+                [state_sock], [], [], 60
+            )
+
+            serialized = b""
+            if read_sockets:
+                serialized = read_sockets[0].recv(10000)
+                logger.info("Pulled {} bytes".format(len(serialized)))
+
+                try:
+                    m = StateList()
+                    m.ParseFromString(serialized)
+
+                    logger.info("Got %d states", len(m.states))
+
+                    if len(m.states) > 0:
+                        with state_lock:
+                            new_model = {
+                                "ready": [],
+                                "busy": [],
+                                "killed": [],
+                                "terminated": [],
+                            }
+                            mapping = {
+                                State.READY: "ready",
+                                State.BUSY: "busy",
+                                State.KILLED: "killed",
+                                State.TERMINATED: "terminated",
+                            }
+                            for st in m.states:
+                                for k in mapping:
+                                    if st.type == k:
+                                        new_model[mapping[k]].append(st)
+                            global state_model
+                            state_model = new_model
+
+                        logger.info("Rendered %d states", len(m.states))
+
+                except DecodeError:
+                    logger.info("Unable to deserialize message, malformed response")
+
+            state_sock.shutdown(socket.SHUT_RDWR)
+
+        except socket.error:
+            logger.warning("State Socket disconnected")
+            state_sock.close()
 
         time.sleep(0.5)
 
